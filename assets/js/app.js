@@ -54,14 +54,28 @@ async function api(action, body = {}) {
     headers: { 'Content-Type': 'application/json' },
     body   : JSON.stringify(body),
   });
-  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  if (!resp.ok) {
+    let errMsg = `HTTP ${resp.status}`;
+    try {
+      const errData = await resp.json();
+      if (errData && errData.error) errMsg = errData.error;
+    } catch (_) { /* ignore JSON parse failure */ }
+    throw new Error(errMsg);
+  }
   return resp.json();
 }
 
 async function apiGet(action, params = {}) {
   const qs = new URLSearchParams({ action, ...params }).toString();
   const resp = await fetch(`api.php?${qs}`);
-  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  if (!resp.ok) {
+    let errMsg = `HTTP ${resp.status}`;
+    try {
+      const errData = await resp.json();
+      if (errData && errData.error) errMsg = errData.error;
+    } catch (_) { /* ignore JSON parse failure */ }
+    throw new Error(errMsg);
+  }
   return resp.json();
 }
 
