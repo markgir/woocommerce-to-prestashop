@@ -150,7 +150,7 @@ function actionTestWc(): never
             ],
         ]);
     } catch (\Throwable $e) {
-        respondError('WooCommerce connection failed: ' . $e->getMessage());
+        respond(['success' => false, 'error' => 'WooCommerce connection failed: ' . $e->getMessage()]);
     }
 }
 
@@ -168,7 +168,7 @@ function actionTestPs(): never
             'id_shop'  => $ps->getDefaultShopId(),
         ]);
     } catch (\Throwable $e) {
-        respondError('PrestaShop connection failed: ' . $e->getMessage());
+        respond(['success' => false, 'error' => 'PrestaShop connection failed: ' . $e->getMessage()]);
     }
 }
 

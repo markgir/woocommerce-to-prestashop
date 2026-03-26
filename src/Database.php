@@ -15,6 +15,27 @@ class Database
         string $password,
         string $prefix = ''
     ) {
+        // For TCP connections, do a quick pre-check with a short timeout so that
+        // an unreachable host fails fast (within ~5 s) instead of hanging for the
+        // full OS-level TCP timeout (~30 s). Without this, a PHP web request can
+        // race against the server's request timeout and the server returns HTTP 500
+        // before PHP has a chance to catch the PDOException and send a proper error.
+        //
+        // Skip the pre-check for Unix-socket paths and for 'localhost', which in
+        // the MySQL client library maps to the local Unix socket rather than a TCP
+        // connection; a missing Unix socket fails immediately via PDO anyway.
+        $isUnixSocket = $host === '' || $host === 'localhost' || str_starts_with($host, '/');
+        if (!$isUnixSocket) {
+            $fp = @fsockopen($host, (int) $port, $errno, $errstr, 5);
+            if ($fp === false) {
+                $detail = ($errstr !== '') ? $errstr : 'connection timed out or host unreachable';
+                throw new \RuntimeException(
+                    "Cannot reach database server at {$host}:{$port} – {$detail}"
+                );
+            }
+            fclose($fp);
+        }
+
         $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset=utf8mb4";
         $options = [
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
