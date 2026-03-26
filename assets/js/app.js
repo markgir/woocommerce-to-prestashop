@@ -6,7 +6,7 @@
 /* ── State ──────────────────────────────────────────────── */
 
 const App = {
-  sessionId: 'sess_' + Math.random().toString(36).slice(2, 10),
+  sessionId: 'sess_' + crypto.randomUUID().replace(/-/g, '').slice(0, 12),
   logOffset : 0,
   pollTimer : null,
   logTimer  : null,
