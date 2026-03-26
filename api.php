@@ -9,6 +9,43 @@ declare(strict_types=1);
  */
 ob_start();
 
+// Ensure the script runs within a reasonable time so the web-server does not
+// kill it with a raw 500. 30 s is generous; all DB connections time out at 5 s.
+@set_time_limit(30);
+
+// ── Fatal-error safety net ────────────────────────────────────────────────
+// If PHP hits a fatal error (e.g. max_execution_time exceeded) the regular
+// try/catch cannot intercept it.  This shutdown function detects the fatal
+// error and emits a proper JSON response instead of letting the web-server
+// return a bare "500 Internal Server Error" page.
+register_shutdown_function(static function (): void {
+    $error = error_get_last();
+    if ($error === null) {
+        return;
+    }
+    $fatal = E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR | E_PARSE | E_USER_ERROR;
+    if (!($error['type'] & $fatal)) {
+        return;
+    }
+    // Discard any partial output already in the buffer
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
+    http_response_code(500);
+    header('Content-Type: application/json; charset=utf-8');
+    header('X-Content-Type-Options: nosniff');
+    $msg = $error['message'];
+    // Provide a friendlier message for the most common fatal: execution timeout
+    if (stripos($msg, 'Maximum execution time') !== false) {
+        $msg = 'The server took too long to respond.  This usually means the '
+             . 'database host is unreachable or very slow.  Double-check the '
+             . 'host, port, and that the MySQL server is running.';
+    }
+    $file = basename($error['file']);
+    error_log("api.php fatal: {$error['message']} in {$file}:{$error['line']}");
+    echo json_encode(['success' => false, 'error' => $msg]);
+});
+
 /**
  * api.php – AJAX endpoint for the WooCommerce → PrestaShop migration tool.
  *

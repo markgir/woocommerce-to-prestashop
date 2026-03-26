@@ -68,6 +68,11 @@ async function api(action, body = {}) {
     } catch (_) {
       if (text) errMsg += ' — ' + text.substring(0, 200);
     }
+    if (resp.status === 500 && errMsg === 'HTTP 500') {
+      errMsg = 'The server returned an internal error (HTTP 500). '
+             + 'This usually means the database host is unreachable or PHP timed out. '
+             + 'Verify the host, port and that the MySQL server is running.';
+    }
     throw new Error(errMsg);
   }
   try {
@@ -93,6 +98,11 @@ async function apiGet(action, params = {}) {
       if (errData && errData.error) errMsg = errData.error;
     } catch (_) {
       if (text) errMsg += ' — ' + text.substring(0, 200);
+    }
+    if (resp.status === 500 && errMsg === 'HTTP 500') {
+      errMsg = 'The server returned an internal error (HTTP 500). '
+             + 'This usually means the database host is unreachable or PHP timed out. '
+             + 'Verify the host, port and that the MySQL server is running.';
     }
     throw new Error(errMsg);
   }
