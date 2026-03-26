@@ -154,7 +154,8 @@ function buildDb(array $cfg): Database
         dbname  : $cfg['dbname']   ?? '',
         user    : $cfg['user']     ?? '',
         password: $cfg['password'] ?? '',
-        prefix  : $cfg['prefix']   ?? ''
+        prefix  : $cfg['prefix']   ?? '',
+        socket  : $cfg['socket']   ?? ''
     );
 }
 

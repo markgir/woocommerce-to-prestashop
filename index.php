@@ -53,7 +53,8 @@
       <div class="form-grid">
         <div class="form-group">
           <label>Host</label>
-          <input type="text" id="wc-host" value="127.0.0.1" placeholder="e.g. 127.0.0.1 or db.example.com">
+          <input type="text" id="wc-host" value="localhost" placeholder="e.g. localhost or 127.0.0.1">
+          <small class="field-hint">Use <code>localhost</code> for Unix socket or <code>127.0.0.1</code> for TCP. MySQL treats them as different hosts for authentication.</small>
         </div>
         <div class="form-group">
           <label>Port</label>
@@ -76,6 +77,10 @@
           <input type="text" id="wc-prefix" value="wp_" placeholder="wp_">
         </div>
         <div class="form-group full">
+          <label data-tip="Optional: absolute path to the MySQL Unix socket file (e.g. /var/run/mysqld/mysqld.sock). Leave empty to use the default.">Socket Path <small>(optional)</small></label>
+          <input type="text" id="wc-socket" placeholder="/var/run/mysqld/mysqld.sock">
+        </div>
+        <div class="form-group full">
           <small id="wc-site-url" style="color:var(--text-muted);font-size:.8rem;"></small>
         </div>
       </div>
@@ -94,7 +99,8 @@
       <div class="form-grid">
         <div class="form-group">
           <label>Host</label>
-          <input type="text" id="ps-host" value="127.0.0.1" placeholder="e.g. 127.0.0.1">
+          <input type="text" id="ps-host" value="localhost" placeholder="e.g. localhost or 127.0.0.1">
+          <small class="field-hint">Use <code>localhost</code> for Unix socket or <code>127.0.0.1</code> for TCP.</small>
         </div>
         <div class="form-group">
           <label>Port</label>
@@ -115,6 +121,10 @@
         <div class="form-group">
           <label data-tip="PrestaShop table prefix (e.g. ps_)">Table Prefix</label>
           <input type="text" id="ps-prefix" value="ps_" placeholder="ps_">
+        </div>
+        <div class="form-group full">
+          <label data-tip="Optional: absolute path to the MySQL Unix socket file. Leave empty to use the default.">Socket Path <small>(optional)</small></label>
+          <input type="text" id="ps-socket" placeholder="/var/run/mysqld/mysqld.sock">
         </div>
         <div class="form-group">
           <label data-tip="PrestaShop major version">PS Version</label>

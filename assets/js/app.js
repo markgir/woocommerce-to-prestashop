@@ -123,6 +123,7 @@ function collectWcConfig() {
     user    : $('#wc-user').value.trim(),
     password: $('#wc-pass').value,
     prefix  : $('#wc-prefix').value.trim() || 'wp_',
+    socket  : ($('#wc-socket')?.value || '').trim(),
   };
 }
 
@@ -134,6 +135,7 @@ function collectPsConfig() {
     user      : $('#ps-user').value.trim(),
     password  : $('#ps-pass').value,
     prefix    : $('#ps-prefix').value.trim() || 'ps_',
+    socket    : ($('#ps-socket')?.value || '').trim(),
     ps_version: $('#ps-version').value,
     id_lang   : parseInt($('#ps-id-lang').value) || 1,
     id_shop   : parseInt($('#ps-id-shop').value) || 1,
