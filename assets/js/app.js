@@ -49,34 +49,58 @@ function toast(msg, type = 'info') {
 /* ── API calls ───────────────────────────────────────────── */
 
 async function api(action, body = {}) {
-  const resp = await fetch(`api.php?action=${action}`, {
-    method : 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body   : JSON.stringify(body),
-  });
+  let resp;
+  try {
+    resp = await fetch(`api.php?action=${action}`, {
+      method : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body   : JSON.stringify(body),
+    });
+  } catch (_) {
+    throw new Error('Unable to reach the server. Check that the URL is correct and the server is running.');
+  }
+  const text = await resp.text();
   if (!resp.ok) {
     let errMsg = `HTTP ${resp.status}`;
     try {
-      const errData = await resp.json();
+      const errData = JSON.parse(text);
       if (errData && errData.error) errMsg = errData.error;
-    } catch (_) { /* ignore JSON parse failure */ }
+    } catch (_) {
+      if (text) errMsg += ' — ' + text.substring(0, 200);
+    }
     throw new Error(errMsg);
   }
-  return resp.json();
+  try {
+    return JSON.parse(text);
+  } catch (_) {
+    throw new Error('Invalid server response (not JSON). Server output: ' + text.substring(0, 200));
+  }
 }
 
 async function apiGet(action, params = {}) {
   const qs = new URLSearchParams({ action, ...params }).toString();
-  const resp = await fetch(`api.php?${qs}`);
+  let resp;
+  try {
+    resp = await fetch(`api.php?${qs}`);
+  } catch (_) {
+    throw new Error('Unable to reach the server.');
+  }
+  const text = await resp.text();
   if (!resp.ok) {
     let errMsg = `HTTP ${resp.status}`;
     try {
-      const errData = await resp.json();
+      const errData = JSON.parse(text);
       if (errData && errData.error) errMsg = errData.error;
-    } catch (_) { /* ignore JSON parse failure */ }
+    } catch (_) {
+      if (text) errMsg += ' — ' + text.substring(0, 200);
+    }
     throw new Error(errMsg);
   }
-  return resp.json();
+  try {
+    return JSON.parse(text);
+  } catch (_) {
+    throw new Error('Invalid server response (not JSON). Server output: ' + text.substring(0, 200));
+  }
 }
 
 /* ── Collect form values ─────────────────────────────────── */
@@ -135,12 +159,13 @@ async function testWcConnection() {
       $('#wc-site-url').textContent = res.site_url || '—';
       toast('WooCommerce connected!', 'success');
     } else {
+      const msg = res.error || 'Connection failed';
       setConnStatus(statusEl, 'err', 'Failed');
-      toast(res.error || 'Connection failed', 'error');
+      toast(msg, 'error');
     }
   } catch (e) {
     setConnStatus(statusEl, 'err', 'Error');
-    toast('Network error: ' + e.message, 'error');
+    toast(e.message, 'error');
   } finally {
     enableBtn(btn, 'Test Connection');
   }
@@ -164,12 +189,13 @@ async function testPsConnection() {
       if (res.id_shop) $('#ps-id-shop').value = res.id_shop;
       toast('PrestaShop connected!', 'success');
     } else {
+      const msg = res.error || 'Connection failed';
       setConnStatus(statusEl, 'err', 'Failed');
-      toast(res.error || 'Connection failed', 'error');
+      toast(msg, 'error');
     }
   } catch (e) {
     setConnStatus(statusEl, 'err', 'Error');
-    toast('Network error: ' + e.message, 'error');
+    toast(e.message, 'error');
   } finally {
     enableBtn(btn, 'Test Connection');
   }
