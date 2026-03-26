@@ -112,17 +112,17 @@ class Database
             return "Access denied for user '{$user}': the MySQL account uses"
                 . ' socket-based authentication (auth_socket / unix_socket plugin)'
                 . ' which does not accept a password from PHP.'
-                . ' Create a dedicated MySQL user with password authentication: '
-                . "CREATE USER '{$user}'@'localhost' IDENTIFIED BY 'yourpassword';"
-                . " GRANT ALL ON `yourdb`.* TO '{$user}'@'localhost'; FLUSH PRIVILEGES;";
+                . ' Create a dedicated MySQL user with password authentication:'
+                . " CREATE USER '<user>'@'localhost' IDENTIFIED BY '<password>';"
+                . " GRANT ALL ON `<database>`.* TO '<user>'@'localhost'; FLUSH PRIVILEGES;";
         }
 
         // 2054 – Unknown authentication method (caching_sha2_password on old PHP)
         if ($code === 2054) {
             return 'The MySQL server uses an authentication method not supported'
                 . ' by this PHP installation (likely caching_sha2_password).'
-                . ' Fix: run  ALTER USER \'' . $user . '\'@\'localhost\''
-                . ' IDENTIFIED WITH mysql_native_password BY \'yourpassword\';'
+                . " Fix: run  ALTER USER '{$user}'@'localhost'"
+                . " IDENTIFIED WITH mysql_native_password BY '<password>';"
                 . '  or upgrade PHP to 7.4+ with mysqlnd.';
         }
 

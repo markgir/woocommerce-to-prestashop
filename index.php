@@ -78,7 +78,7 @@
         </div>
         <div class="form-group full">
           <label data-tip="Optional: absolute path to the MySQL Unix socket file (e.g. /var/run/mysqld/mysqld.sock). Leave empty to use the default.">Socket Path <small>(optional)</small></label>
-          <input type="text" id="wc-socket" placeholder="/var/run/mysqld/mysqld.sock  (leave empty for default)">
+          <input type="text" id="wc-socket" placeholder="/var/run/mysqld/mysqld.sock">
         </div>
         <div class="form-group full">
           <small id="wc-site-url" style="color:var(--text-muted);font-size:.8rem;"></small>
@@ -124,7 +124,7 @@
         </div>
         <div class="form-group full">
           <label data-tip="Optional: absolute path to the MySQL Unix socket file. Leave empty to use the default.">Socket Path <small>(optional)</small></label>
-          <input type="text" id="ps-socket" placeholder="/var/run/mysqld/mysqld.sock  (leave empty for default)">
+          <input type="text" id="ps-socket" placeholder="/var/run/mysqld/mysqld.sock">
         </div>
         <div class="form-group">
           <label data-tip="PrestaShop major version">PS Version</label>
