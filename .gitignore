@@ -1,0 +1,5 @@
+migration_progress/*.json
+migration_progress/*.log
+/vendor/
+.env
+*.lock
