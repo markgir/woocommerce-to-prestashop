@@ -36,6 +36,13 @@ class Database
             fclose($fp);
         }
 
+        // Limit PHP-level socket/stream operations to 5 s so that a stalled
+        // connection (e.g. 'localhost' falling through to a slow TCP attempt on
+        // shared hosting where no Unix socket exists) does not hang until the
+        // web-server's request timeout kills the PHP process with a raw 500.
+        $prevSocketTimeout = ini_get('default_socket_timeout');
+        ini_set('default_socket_timeout', '5');
+
         $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset=utf8mb4";
         $options = [
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
@@ -44,7 +51,12 @@ class Database
             PDO::ATTR_TIMEOUT            => 5,
             PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci",
         ];
-        $this->pdo    = new PDO($dsn, $user, $password, $options);
+
+        try {
+            $this->pdo = new PDO($dsn, $user, $password, $options);
+        } finally {
+            ini_set('default_socket_timeout', $prevSocketTimeout ?: '60');
+        }
         $this->prefix = $prefix;
     }
 
