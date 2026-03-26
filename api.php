@@ -3,6 +3,13 @@
 declare(strict_types=1);
 
 /**
+ * Capture any accidental output (PHP warnings, notices, deprecation messages)
+ * so it doesn't corrupt the JSON response.  The respond() helper discards
+ * captured output before echoing the JSON body.
+ */
+ob_start();
+
+/**
  * api.php – AJAX endpoint for the WooCommerce → PrestaShop migration tool.
  *
  * All requests are POST with Content-Type: application/json.
@@ -69,12 +76,19 @@ function respond(array $data, int $status = 200): never
         $json = '{"success":false,"error":"Response encoding error"}';
     }
 
-    echo $json;
-
-    // Flush output buffers so the response reaches the client before exit
-    if (ob_get_level() > 0) {
-        ob_end_flush();
+    // Discard any accidental output that was captured by ob_start() at the
+    // top of this file (PHP warnings, notices, deprecation messages, etc.).
+    // Without this, the output buffer may contain non-JSON text that gets
+    // prepended to the response, breaking JSON parsing on the client.
+    $discarded = '';
+    while (ob_get_level() > 0) {
+        $discarded .= ob_get_clean();
     }
+    if ($discarded !== '') {
+        error_log('api.php: discarded accidental output: ' . substr($discarded, 0, 500));
+    }
+
+    echo $json;
 
     exit;
 }
